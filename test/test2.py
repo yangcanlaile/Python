@@ -1,3 +1,9 @@
-import urllib.request
-response = urllib.request.urlopen("https://www.python.org")
-print(response)
+import socket
+import  urllib.request
+import urllib.error
+try:
+    response = urllib.request.urlopen('http://www.baidu.com', timeout=1)
+except urllib.error.URLError as e:
+    print(type(e.reason))
+    if isinstance(e.reason, socket.timeout):
+        print('TIME OUT')
