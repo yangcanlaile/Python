@@ -1,7 +1,7 @@
 # requests库请求网页获取内容
 # get,poost, put, delete, head, options
 #####requests.codes状态码########
-#100: continue
+# 100: continue
 # 101: switching_protocols
 # 102: processing
 # 103: checkpoint
@@ -74,8 +74,15 @@
 
 import requests
 import re
+import sys
+import io
 
-#测试Requests Get ,传递params, headers
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='gb2312')
+
+# 测试Requests Get ,传递params, headers
+from requests import RequestException
+
+
 def testRequestsGet():
     url = 'http://httpbin.org/get'
     r = requests.get(url)
@@ -100,17 +107,79 @@ def testRequestsGet():
     # r = requests.get(url, params=data)
     # print(r.text)
 
-#测试获取二进制图片
+
+# 测试获取二进制图片
 def testRequestsImage():
     r = requests.get('http://github.com/favicon.ico')
     with open('favicon.ico', 'wb') as f:
         f.write(r.content)
     print(type(requests.codes.ok))
 
-#文件上传
+
+# 文件上传
 def uploadFiles():
     files = {'file': open('favicon.ico', 'rb')}
-    r = requests.post("http://httpbin.org/post", files = files)
+    r = requests.post("http://httpbin.org/post", files=files)
     print(r.text)
 
 
+# 保持会话
+def keepSession():
+    s = requests.session()
+    url = 'http://httpbin.org/cookies/set/number/123456789'
+    s.get(url)
+    r = s.get('http://httpbin.org/cookies')
+    print(r.text)
+
+
+# SSL证书验证
+def SSLVerifyReq():
+    response = requests.get('http://www.12306.cn')
+    print(response.status_code)
+
+
+# SSL忽略证书验证
+def SSLUnVerifyReq():
+    response = requests.get('http://www.12306.cn', verify=False)
+    print(response.status_code)
+
+
+# SSL证书验证，并指定特定文件
+def SSLVerifyFileReq():
+    response = requests.get('http://www.12306.cn', cert=('path/server.crt', '/path/key'))
+    print(response.status_code)
+
+
+# 代理设置
+def usingProxiesReq(url):
+    headers = {
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+        'Accept-Encoding': 'gzip, deflate, br',
+        'Accept-Language': 'zh-CN,zh;q=0.9',
+        'Cache-Control': 'max-age=0',
+        'Connection': 'keep-alive',
+        'Cookie': 'PHPSESSID=1l5vavpm905cc1okesbqobh5rs; Hm_lvt_a3c0d937c858fbe264753596e485cd38=1565703497,1565782337,1565782903,1567004371; MEIQIA_TRACK_ID=1PMyruQzaBLLntKCOT2RtACarCv; Hm_lpvt_a3c0d937c858fbe264753596e485cd38=1567005430',
+        'Host': 'www.w3cschool.cn',
+        'Upgrade-Insecure-Requests': '1',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36', }
+    proxies = {  # 切换成你可用的代理
+        "http": "http://192.99.203.93:35289",
+        "https": "http://192.99.203.93:35289"
+    }
+
+    response = requests.get(url, headers=headers)
+    # print(response.text.encode('gb2312', 'ignore'))
+    print(response.encoding)
+    print(response.apparent_encoding)
+    # r1 = response.encoding = 'gb2312'
+    # response.content 为bytes类型，
+    # response.text为UNICODE编码后的文本
+    r = str(response.content, encoding=requests.utils.get_encodings_from_content(response.text)[0])
+    # print(requests.utils.get_encodings_from_content(r))
+
+    with open('1.html', 'w', encoding='utf-8') as file:
+        file.write(r)
+
+
+url = 'http://www.w3cschool.cn'
+usingProxiesReq(url)
