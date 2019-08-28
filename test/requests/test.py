@@ -1,0 +1,2 @@
+import requestsFunc
+requestsFunc.testRequestsImage()
