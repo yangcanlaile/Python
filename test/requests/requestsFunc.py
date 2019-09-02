@@ -177,7 +177,7 @@ def usingProxiesReq(url):
     r = str(response.content, encoding=requests.utils.get_encodings_from_content(response.text)[0])
     # print(requests.utils.get_encodings_from_content(r))
 
-    with open('1.html', 'w', encoding='utf-8') as file:
+    with open('test.html', 'w', encoding='utf-8') as file:
         file.write(r)
 
 
